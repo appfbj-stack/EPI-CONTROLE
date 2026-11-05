@@ -1,6 +1,7 @@
 import React from 'react';
 import { ShieldCheck, HardHat, AlertTriangle, AlertCircle, CheckCircle2, FileSpreadsheet, Plus, Settings, Users, PackageCheck } from 'lucide-react';
 import { CompanyInfo, EPIAlert, Funcionario } from '../types';
+import { PWAInstallButton } from './PWAInstallButton';
 
 interface HeaderProps {
   company: CompanyInfo;
@@ -57,6 +58,8 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Quick Action Buttons */}
           <div className="flex items-center flex-wrap gap-2">
+            <PWAInstallButton />
+
             <button
               onClick={onOpenNewDelivery}
               className="inline-flex items-center gap-2 px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold text-sm rounded-lg shadow-sm transition-colors cursor-pointer"

@@ -9,6 +9,7 @@ import { ReturnModal } from './components/ReturnModal';
 import { EmployeeFormModal } from './components/EmployeeFormModal';
 import { PrintSheetModal } from './components/PrintSheetModal';
 import { CompanySettingsModal } from './components/CompanySettingsModal';
+import { OfflineIndicator } from './components/OfflineIndicator';
 import { storage } from './utils/storage';
 import { generateAlerts } from './utils/alerts';
 import { exportAllEmployeesToExcel } from './utils/excelExport';
@@ -404,6 +405,9 @@ export default function App() {
           onImportJson={handleImportJson}
         />
       )}
+
+      {/* Offline Status Badge */}
+      <OfflineIndicator />
     </div>
   );
 }
