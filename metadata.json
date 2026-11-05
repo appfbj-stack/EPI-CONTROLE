@@ -1,0 +1,6 @@
+{
+  "name": "GestorEPI - Controle de EPIs & Fichas NR-6",
+  "description": "Sistema completo e intuitivo para gestão e controle de EPIs por colaborador, ficha individual de entrega conforme NR-6, exportação para Excel e alertas automáticos de vencimento e validade de C.A.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
