@@ -85,7 +85,11 @@ export function exportSingleEmployeeToExcel(
         formatDateBr(d.dataPrevisaoTroca),
         STATUS_LABELS[d.status] || d.status,
         d.dataDevolucao ? formatDateBr(d.dataDevolucao) : '-',
-        d.termoAssinado ? `[V] Assinado digitalmente (${formatDateBr(d.assinadoEm?.split('T')[0] || d.dataEntrega)})` : '___________________________',
+        d.assinaturaUrl
+          ? `[V] Assinatura Digital Touch Registrada (${formatDateBr(d.assinadoEm?.split('T')[0] || d.dataEntrega)})`
+          : d.termoAssinado
+          ? `[V] Confirmado Eletronicamente (${formatDateBr(d.assinadoEm?.split('T')[0] || d.dataEntrega)})`
+          : '___________________________',
       ]);
     });
   }

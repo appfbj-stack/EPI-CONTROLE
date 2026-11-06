@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { X, FileSpreadsheet, Printer, PackageCheck, RefreshCw, Undo2, AlertCircle, AlertTriangle, CheckCircle2, Shield, Calendar, User, Briefcase, Building, CreditCard, Clock, FileCheck } from 'lucide-react';
+import { X, FileSpreadsheet, Printer, PackageCheck, RefreshCw, Undo2, AlertCircle, AlertTriangle, CheckCircle2, Shield, Calendar, User, Briefcase, Building, CreditCard, Clock, FileCheck, PenTool } from 'lucide-react';
 import { CompanyInfo, DeliveryRecord, EPIAlert, Funcionario, PPEItem } from '../types';
 import { exportSingleEmployeeToExcel } from '../utils/excelExport';
 import { formatDateBr, getDaysDiff } from '../utils/alerts';
+import { DigitalSignaturePad } from './DigitalSignaturePad';
 
 interface EmployeeDetailModalProps {
   employee: Funcionario;
@@ -16,6 +17,7 @@ interface EmployeeDetailModalProps {
   onPrintSheet: (emp: Funcionario) => void;
   onEditEmployee: (emp: Funcionario) => void;
   onToggleSignature: (deliveryId: string) => void;
+  onSaveSignature: (deliveryId: string, signatureUrl: string) => void;
 }
 
 export const EmployeeDetailModal: React.FC<EmployeeDetailModalProps> = ({
@@ -30,8 +32,10 @@ export const EmployeeDetailModal: React.FC<EmployeeDetailModalProps> = ({
   onPrintSheet,
   onEditEmployee,
   onToggleSignature,
+  onSaveSignature,
 }) => {
   const [activeTab, setActiveTab] = useState<'ativos' | 'historico' | 'termo'>('ativos');
+  const [signingDelivery, setSigningDelivery] = useState<DeliveryRecord | null>(null);
 
   const empDeliveries = deliveries
     .filter((d) => d.funcionarioId === employee.id)
@@ -323,23 +327,45 @@ export const EmployeeDetailModal: React.FC<EmployeeDetailModalProps> = ({
                               <span>Motivo: <strong>{del.motivo}</strong></span>
                             </div>
 
-                            {/* Signature status */}
-                            <div className="flex items-center gap-2 pt-1">
-                              <button
-                                onClick={() => onToggleSignature(del.id)}
-                                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium cursor-pointer transition-colors ${
-                                  del.termoAssinado
-                                    ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
-                                    : 'bg-amber-100 text-amber-800 border border-amber-300 hover:bg-amber-200'
-                                }`}
-                              >
-                                <CheckCircle2 className="w-3.5 h-3.5" />
-                                <span>
-                                  {del.termoAssinado
-                                    ? `Recibo Assinado (${formatDateBr(del.assinadoEm?.split('T')[0] || del.dataEntrega)})`
-                                    : 'Assinatura Pendente (Clique para confirmar recebimento)'}
-                                </span>
-                              </button>
+                            {/* Signature status and Digital Signature Pad Trigger */}
+                            <div className="flex items-center gap-2 pt-1 flex-wrap">
+                              {del.assinaturaUrl ? (
+                                <div className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-800 border border-emerald-300 px-2.5 py-1 rounded-lg text-xs font-medium">
+                                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
+                                  <span>Assinatura Digital Registrada ({formatDateBr(del.assinadoEm?.split('T')[0] || del.dataEntrega)})</span>
+                                  <div className="h-6 w-14 bg-white rounded border border-emerald-200 flex items-center justify-center p-0.5 ml-1">
+                                    <img src={del.assinaturaUrl} alt="Assinatura" className="max-h-full max-w-full object-contain" />
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => setSigningDelivery(del)}
+                                    className="text-[11px] text-emerald-800 underline hover:text-emerald-950 font-semibold ml-1 cursor-pointer"
+                                  >
+                                    Ver/Alterar
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => setSigningDelivery(del)}
+                                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-lg shadow-2xs transition-colors cursor-pointer"
+                                    title="Abrir tela de assinatura touch/mouse para o colaborador rubricar"
+                                  >
+                                    <PenTool className="w-3.5 h-3.5" />
+                                    <span>Coletar Assinatura Digital</span>
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => onToggleSignature(del.id)}
+                                    className="text-[11px] text-slate-500 hover:text-slate-800 underline cursor-pointer"
+                                    title="Marcar apenas como confirmado"
+                                  >
+                                    {del.termoAssinado ? 'Confirmado sem rubrica' : 'Marcar recebido'}
+                                  </button>
+                                </div>
+                              )}
                             </div>
                           </div>
 
@@ -447,6 +473,19 @@ export const EmployeeDetailModal: React.FC<EmployeeDetailModalProps> = ({
           </button>
         </div>
       </div>
+
+      {signingDelivery && (
+        <DigitalSignaturePad
+          funcionario={employee}
+          itemDescription={`${signingDelivery.epiNome} (C.A. ${signingDelivery.numeroCA})`}
+          initialSignature={signingDelivery.assinaturaUrl}
+          onSave={(signatureDataUrl) => {
+            onSaveSignature(signingDelivery.id, signatureDataUrl);
+            setSigningDelivery(null);
+          }}
+          onClose={() => setSigningDelivery(null)}
+        />
+      )}
     </div>
   );
 };

@@ -2,6 +2,7 @@ import React from 'react';
 import { ShieldCheck, HardHat, AlertTriangle, AlertCircle, CheckCircle2, FileSpreadsheet, Plus, Settings, Users, PackageCheck } from 'lucide-react';
 import { CompanyInfo, EPIAlert, Funcionario } from '../types';
 import { PWAInstallButton } from './PWAInstallButton';
+import { HamburgerMenu } from './HamburgerMenu';
 
 interface HeaderProps {
   company: CompanyInfo;
@@ -56,13 +57,13 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Quick Action Buttons */}
-          <div className="flex items-center flex-wrap gap-2">
+          {/* Quick Action Buttons & Hamburger Menu */}
+          <div className="flex items-center gap-2">
             <PWAInstallButton />
 
             <button
               onClick={onOpenNewDelivery}
-              className="inline-flex items-center gap-2 px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold text-sm rounded-lg shadow-sm transition-colors cursor-pointer"
+              className="hidden sm:inline-flex items-center gap-2 px-3 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold text-xs sm:text-sm rounded-lg shadow-sm transition-colors cursor-pointer"
               title="Registrar nova entrega de EPI para um colaborador"
             >
               <PackageCheck className="w-4 h-4" />
@@ -71,7 +72,7 @@ export const Header: React.FC<HeaderProps> = ({
 
             <button
               onClick={onOpenNewEmployee}
-              className="inline-flex items-center gap-2 px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-100 font-medium text-sm rounded-lg border border-slate-700 transition-colors cursor-pointer"
+              className="hidden md:inline-flex items-center gap-2 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-100 font-medium text-xs sm:text-sm rounded-lg border border-slate-700 transition-colors cursor-pointer"
             >
               <Plus className="w-4 h-4 text-slate-300" />
               <span>Novo Colaborador</span>
@@ -79,21 +80,37 @@ export const Header: React.FC<HeaderProps> = ({
 
             <button
               onClick={onExportAllExcel}
-              className="inline-flex items-center gap-2 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-sm rounded-lg shadow-sm transition-colors cursor-pointer"
+              className="hidden lg:inline-flex items-center gap-2 px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs sm:text-sm rounded-lg shadow-sm transition-colors cursor-pointer"
               title="Baixar planilha completa com todos os funcionários, histórico e alertas"
             >
               <FileSpreadsheet className="w-4 h-4" />
-              <span className="hidden sm:inline">Exportar Geral</span>
-              <span className="text-xs bg-emerald-700/60 px-1.5 py-0.5 rounded text-emerald-100">.XLSX</span>
+              <span>Exportar Geral</span>
+              <span className="text-[10px] bg-emerald-700/60 px-1.5 py-0.5 rounded text-emerald-100 font-mono">.XLSX</span>
             </button>
 
             <button
               onClick={onOpenCompanySettings}
-              className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+              className="hidden sm:inline-flex p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
               title="Configurações da Empresa e SESMT"
             >
               <Settings className="w-5 h-5" />
             </button>
+
+            {/* Hamburger Menu Trigger */}
+            <div className="pl-1 border-l border-slate-800">
+              <HamburgerMenu
+                company={company}
+                employees={employees}
+                activeDeliveriesCount={activeDeliveriesCount}
+                alerts={alerts}
+                currentTab={currentTab}
+                onSelectTab={onSelectTab}
+                onOpenNewEmployee={onOpenNewEmployee}
+                onOpenNewDelivery={onOpenNewDelivery}
+                onOpenCompanySettings={onOpenCompanySettings}
+                onExportAllExcel={onExportAllExcel}
+              />
+            </div>
           </div>
         </div>
 

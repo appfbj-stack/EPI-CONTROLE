@@ -206,6 +206,8 @@ const defaultDeliveries: DeliveryRecord[] = [
     status: 'ativo',
     termoAssinado: true,
     assinadoEm: addDaysToDate(today, -120),
+    assinaturaUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="60" viewBox="0 0 200 60"><path d="M 20 40 Q 45 10 70 35 T 110 25 T 150 35 Q 170 15 185 30 M 40 28 L 160 42" stroke="%230f172a" stroke-width="2.8" fill="none" stroke-linecap="round"/></svg>',
+    assinanteNome: 'Marcos Vinicius Santos Pereira',
   },
   {
     id: 'del-2',

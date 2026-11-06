@@ -161,8 +161,17 @@ export const PrintSheetModal: React.FC<PrintSheetModalProps> = ({
                     <td className="p-2 border-r border-slate-200 text-center">
                       {del.dataDevolucao ? formatDateBr(del.dataDevolucao) : '-'}
                     </td>
-                    <td className="p-2 text-center text-[10px] text-slate-500 italic">
-                      {del.termoAssinado ? '[Recibo Confirmado]' : '_______________________'}
+                    <td className="p-2 text-center text-[10px]">
+                      {del.assinaturaUrl ? (
+                        <div className="flex flex-col items-center justify-center">
+                          <img src={del.assinaturaUrl} alt="Assinatura Digital" className="h-6 max-w-[110px] object-contain" />
+                          <span className="text-[8px] text-emerald-800 font-mono font-medium">Assinado Digitalmente ({formatDateBr(del.assinadoEm?.split('T')[0] || del.dataEntrega)})</span>
+                        </div>
+                      ) : del.termoAssinado ? (
+                        <span className="text-slate-600 font-medium">[Recibo Confirmado]</span>
+                      ) : (
+                        <span className="text-slate-400">_______________________</span>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -172,7 +181,14 @@ export const PrintSheetModal: React.FC<PrintSheetModalProps> = ({
 
           {/* Signatures */}
           <div className="pt-8 grid grid-cols-2 gap-8 text-center text-[11px]">
-            <div className="border-t border-slate-800 pt-2">
+            <div className="border-t border-slate-800 pt-2 flex flex-col items-center">
+              {empDeliveries.find((d) => d.assinaturaUrl)?.assinaturaUrl && (
+                <img
+                  src={empDeliveries.find((d) => d.assinaturaUrl)?.assinaturaUrl}
+                  alt="Assinatura Digital"
+                  className="h-10 max-w-[180px] object-contain -mt-6 mb-0.5"
+                />
+              )}
               <strong className="block text-slate-900">{employee.nome}</strong>
               <span className="text-slate-500">Assinatura do Empregado (CPF: {employee.cpf})</span>
             </div>

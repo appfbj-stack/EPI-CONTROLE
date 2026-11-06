@@ -45,6 +45,8 @@ export interface DeliveryRecord {
   observacoes?: string;
   termoAssinado: boolean; // Confirmação de recebimento
   assinadoEm?: string; // ISO timestamp
+  assinaturaUrl?: string; // Data URL (image/png) capturada via Signature Pad
+  assinanteNome?: string; // Nome do colaborador que assinou digitalmente
 }
 
 export interface Funcionario {

@@ -163,6 +163,22 @@ export default function App() {
     showToast('Status do termo de recebimento atualizado!');
   };
 
+  const handleSaveDigitalSignature = (deliveryId: string, signatureUrl: string) => {
+    const updated = deliveries.map((d) => {
+      if (d.id === deliveryId) {
+        return {
+          ...d,
+          termoAssinado: true,
+          assinadoEm: new Date().toISOString(),
+          assinaturaUrl: signatureUrl,
+        };
+      }
+      return d;
+    });
+    setDeliveries(updated);
+    showToast('Assinatura digital registrada com sucesso na Ficha NR-6!');
+  };
+
   // Handlers for Employees
   const handleSaveEmployee = (data: Omit<Funcionario, 'id'>, id?: string) => {
     if (id) {
@@ -345,6 +361,7 @@ export default function App() {
             setIsEmployeeFormOpen(true);
           }}
           onToggleSignature={handleToggleSignature}
+          onSaveSignature={handleSaveDigitalSignature}
         />
       )}
 

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { X, PackageCheck, AlertTriangle, ShieldCheck, Calendar, Info, AlertCircle } from 'lucide-react';
+import { X, PackageCheck, AlertTriangle, ShieldCheck, Calendar, Info, AlertCircle, PenTool, CheckCircle2, Eraser } from 'lucide-react';
 import { DeliveryRecord, Funcionario, PPEItem, PPEMotivo } from '../types';
 import { addDaysToDate, formatDateBr, getDaysDiff, getTodayStr } from '../utils/alerts';
+import { DigitalSignaturePad } from './DigitalSignaturePad';
 
 interface DeliveryModalProps {
   employees: Funcionario[];
@@ -27,6 +28,8 @@ export const DeliveryModal: React.FC<DeliveryModalProps> = ({
   const [motivo, setMotivo] = useState<PPEMotivo>(preSelectedPPEId ? 'substituicao_periodica' : 'admissao');
   const [observacoes, setObservacoes] = useState('');
   const [termoAssinado, setTermoAssinado] = useState(true);
+  const [assinaturaUrl, setAssinaturaUrl] = useState<string | undefined>();
+  const [showSignaturePad, setShowSignaturePad] = useState(false);
 
   // Selected EPI details
   const selectedEPI = catalog.find((item) => item.id === epiId);
@@ -56,8 +59,10 @@ export const DeliveryModal: React.FC<DeliveryModalProps> = ({
       motivo,
       status: 'ativo',
       observacoes,
-      termoAssinado,
-      assinadoEm: termoAssinado ? new Date().toISOString() : undefined,
+      termoAssinado: Boolean(termoAssinado || assinaturaUrl),
+      assinadoEm: (termoAssinado || assinaturaUrl) ? new Date().toISOString() : undefined,
+      assinaturaUrl,
+      assinanteNome: selectedEmployee?.nome,
     });
 
     onClose();
@@ -217,19 +222,83 @@ export const DeliveryModal: React.FC<DeliveryModalProps> = ({
             />
           </div>
 
-          {/* Termo de Confirmação NR-6 */}
-          <div className="bg-amber-50/60 p-3.5 rounded-xl border border-amber-200 flex items-start gap-3">
-            <input
-              type="checkbox"
-              id="termoCheck"
-              checked={termoAssinado}
-              onChange={(e) => setTermoAssinado(e.target.checked)}
-              className="mt-1 h-4 w-4 rounded text-amber-600 focus:ring-amber-500 border-slate-300 cursor-pointer"
-            />
-            <label htmlFor="termoCheck" className="text-xs text-slate-700 cursor-pointer leading-tight">
-              <strong>Confirmar Recibo Digital:</strong> O empregado declara ter recebido o equipamento em perfeito
-              estado de conservação e uso, instruído sobre o uso correto e ciente das obrigações da NR-6.
-            </label>
+          {/* Termo de Confirmação e Assinatura Digital NR-6 */}
+          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                <PenTool className="w-4 h-4 text-amber-500" />
+                Assinatura Digital do Empregado (NR-6)
+              </span>
+
+              {assinaturaUrl ? (
+                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  Assinatura Coletada
+                </span>
+              ) : (
+                <span className="text-[11px] text-slate-400">Pendente de rubrica</span>
+              )}
+            </div>
+
+            {assinaturaUrl ? (
+              <div className="bg-white p-3 rounded-lg border border-slate-200 flex items-center justify-between gap-3">
+                <div className="space-y-1">
+                  <span className="text-[10px] text-slate-400 uppercase font-mono block">Rubrica Digital Registrada:</span>
+                  <div className="h-14 max-w-[200px] border border-slate-100 rounded bg-slate-50/50 flex items-center justify-center p-1">
+                    <img src={assinaturaUrl} alt="Assinatura Digital" className="max-h-full max-w-full object-contain" />
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1.5 text-right">
+                  <button
+                    type="button"
+                    onClick={() => setShowSignaturePad(true)}
+                    className="text-xs text-amber-600 hover:text-amber-700 font-medium underline cursor-pointer"
+                  >
+                    Assinar Novamente
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAssinaturaUrl(undefined)}
+                    className="text-xs text-rose-600 hover:text-rose-700 font-medium flex items-center gap-1 justify-end cursor-pointer"
+                  >
+                    <Eraser className="w-3 h-3" />
+                    <span>Remover</span>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-amber-50/60 p-3 rounded-lg border border-amber-200">
+                <div className="text-xs text-slate-700 leading-snug">
+                  <strong>Colher Assinatura Digital Agora:</strong>
+                  <p className="text-slate-500 text-[11px] mt-0.5">
+                    O colaborador pode assinar direto na tela do celular (touch) ou computador (mouse).
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setShowSignaturePad(true)}
+                  className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-lg transition-colors cursor-pointer shadow-xs whitespace-nowrap"
+                >
+                  <PenTool className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Coletar Assinatura</span>
+                </button>
+              </div>
+            )}
+
+            <div className="flex items-start gap-2 pt-1">
+              <input
+                type="checkbox"
+                id="termoCheck"
+                checked={termoAssinado || Boolean(assinaturaUrl)}
+                onChange={(e) => setTermoAssinado(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded text-amber-600 focus:ring-amber-500 border-slate-300 cursor-pointer"
+              />
+              <label htmlFor="termoCheck" className="text-[11px] text-slate-600 cursor-pointer leading-tight">
+                Declaro o recebimento do EPI novo e em perfeitas condições, instruído sobre o uso e ciente das obrigações da NR-6.
+              </label>
+            </div>
           </div>
 
           {/* Form Actions */}
@@ -251,6 +320,20 @@ export const DeliveryModal: React.FC<DeliveryModalProps> = ({
           </div>
         </form>
       </div>
+
+      {showSignaturePad && selectedEmployee && (
+        <DigitalSignaturePad
+          funcionario={selectedEmployee}
+          itemDescription={selectedEPI ? `${selectedEPI.nome} (C.A. ${selectedEPI.numeroCA})` : undefined}
+          initialSignature={assinaturaUrl}
+          onSave={(dataUrl) => {
+            setAssinaturaUrl(dataUrl);
+            setTermoAssinado(true);
+            setShowSignaturePad(false);
+          }}
+          onClose={() => setShowSignaturePad(false)}
+        />
+      )}
     </div>
   );
 };
